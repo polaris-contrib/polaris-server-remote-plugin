@@ -17,7 +17,9 @@
 
 package log
 
-import "github.com/hashicorp/go-hclog"
+import (
+	"github.com/hashicorp/go-hclog"
+)
 
 // hcLoggerWrapper hclog wrapper.
 type hcLoggerWrapper struct {
@@ -32,7 +34,27 @@ func newHCLoggerWrapper() *hcLoggerWrapper {
 	}
 }
 
+// Debug emit a message and key/value pairs at the debug level
+func (h *hcLoggerWrapper) Debug(msg string, args ...interface{}) {
+	h.Logger.Debug(msg, args)
+}
+
+// Info emit a message and key/value pairs at the info level
+func (h *hcLoggerWrapper) Info(msg string, args ...interface{}) {
+	h.Logger.Info(msg, args)
+}
+
+// Warn emit a message and key/value pairs at the warn level
+func (h *hcLoggerWrapper) Warn(msg string, args ...interface{}) {
+	h.Logger.Warn(msg, args)
+}
+
+// Error emit a message and key/value pairs at the error level
+func (h *hcLoggerWrapper) Error(msg string, args ...interface{}) {
+	h.Logger.Error(msg, args)
+}
+
 // Fatal emit a message and key/value pairs at the fatal level
 func (h *hcLoggerWrapper) Fatal(msg string, args ...interface{}) {
-	h.Error(msg, args)
+	h.Error(msg, args...)
 }

@@ -55,9 +55,9 @@ func New(path string, callback OnModifiedEvent) *Watcher {
 				if ev.Op == fsnotify.Create {
 					pw.eventChannel <- ev.Name
 				}
-				log.DefaultLogger.Info("got plugin file watch event", "event", ev)
+				log.Info("got plugin file watch event", "event", ev)
 			case err = <-watcher.Errors:
-				log.DefaultLogger.Error("got error from plugin file watcher", "error_event", err)
+				log.Error("got error from plugin file watcher", "error_event", err)
 			}
 		}
 	}(pw)
@@ -70,7 +70,7 @@ func New(path string, callback OnModifiedEvent) *Watcher {
 
 	err = pw.watcher.Add(path)
 	if err != nil {
-		log.DefaultLogger.Fatal("failed to add plugin file watcher", "error", err)
+		log.Fatal("failed to add plugin file watcher", "error", err)
 	}
 
 	return pw

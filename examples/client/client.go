@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	"log"
 	"time"
 
 	pluginsdk "github.com/polaris-contrib/polaris-server-remote-plugin-common"
 	"github.com/polaris-contrib/polaris-server-remote-plugin-common/api"
 	"github.com/polaris-contrib/polaris-server-remote-plugin-common/client"
+	"github.com/polaris-contrib/polaris-server-remote-plugin-common/log"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 			},
 		},
 	); err != nil {
-		log.Fatalf("server-v1 register failed: %+v", err)
+		log.Fatal("server-v1 register failed", "error", err)
 		return
 	}
 
@@ -36,7 +36,7 @@ func main() {
 			Mode: client.RumModelCompanion,
 		},
 	); err != nil {
-		log.Fatalf("server-v2 register failed: %+v", err)
+		log.Fatal("server-v2 register failed", "error", err)
 	}
 
 	if client3, err = client.Register(
@@ -47,7 +47,7 @@ func main() {
 				Address: "0.0.0.0:8972",
 			},
 		}); err != nil {
-		log.Fatalf("server-v3 register failed: %+v", err)
+		log.Fatal("server-v3 register failed", "error", err)
 	}
 
 	clientInvoke(client1, "1")
@@ -64,14 +64,14 @@ func clientInvoke(pc *client.Client, name string) {
 		Type: api.RatelimitType_IPRatelimit, Key: "127.0.0.1",
 	})
 	if err != nil {
-		log.Fatalf("client-%s fail to marshal request: %+v", name, err)
+		log.Fatal("fail to marshal request", "client_name", name, "error", err)
 	}
 
 	response, err := pc.Call(context.Background(), req)
 
 	if err != nil {
-		log.Fatalf("client-%s fail to invoke: %+v", name, err)
+		log.Fatal("fail to invoke", "client_name", name, "error", err)
 	}
 
-	log.Printf("response body from client-%s: %s\n", name, response.String())
+	log.Info("response body from client", "client_name", name, "response", response.String())
 }

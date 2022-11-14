@@ -25,10 +25,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 
 	pluginsdk "github.com/polaris-contrib/polaris-server-remote-plugin-common"
+	"github.com/polaris-contrib/polaris-server-remote-plugin-common/log"
 	"github.com/polaris-contrib/polaris-server-remote-plugin-common/plugins"
 )
 
@@ -38,17 +38,9 @@ var (
 
 	// LivenessCheckInterval the interval of liveness
 	LivenessCheckInterval = time.Second
-
-	// logger
-	logger hclog.Logger
 )
 
 func init() {
-	logger = hclog.New(&hclog.LoggerOptions{
-		Name:   "plugin",
-		Output: os.Stdout,
-		Level:  hclog.Debug,
-	})
 	parentPID = os.Getppid()
 }
 
@@ -75,7 +67,7 @@ func Serve(svc plugins.Service) {
 	// logger.Info("plugin ", pluginName, " use cpu numbers: ", runtime.GOMAXPROCS(0))
 
 	go func() {
-		checkMainProcessLivenessTimer()
+		checkMainProcessLivenessTimer(pluginName)
 	}()
 
 	// logger.Info("plugin ", pluginName, " is running ...")
@@ -93,28 +85,28 @@ func Serve(svc plugins.Service) {
 // Because we do not use the re-attach capability of the go-plugin, once the main process of
 // the Polaris service exits, we need to exit the plug-in to prevent many zombie plugins
 // from entering the field
-func checkMainProcessLivenessTimer() {
+func checkMainProcessLivenessTimer(pluginName string) {
 	ticker := time.NewTicker(LivenessCheckInterval)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ticker.C:
-			canIExit()
+			canIExit(pluginName)
 		}
 	}
 }
 
 // canIExit check main process is alive or not, exit when main process was exited.
-func canIExit() {
+func canIExit(pluginName string) {
 	// Process ID 1 is id of the init process, when equals to 1 means current process is zombie process.
 	if parentPID == 1 || os.Getppid() != parentPID {
-		logger.Error("polaris server has gone, %s will exit ...", filepath.Base(os.Args[0]))
+		log.Error("polaris server has gone, will exit", "plugin_name", pluginName)
 		_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 	}
 
 	if _, err := os.FindProcess(parentPID); err != nil {
-		logger.Error("can not find polaris server, plugin %s will exit ...", filepath.Base(os.Args[0]))
+		log.Error("can not find polaris server, will exit", "plugin_name", pluginName)
 		_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 	}
 }
