@@ -44,6 +44,11 @@ func Info(msg string, args ...interface{}) {
 	DefaultLogger.Info(msg, args...)
 }
 
+// Warn omit message and k,v paris at warn level.
+func Warn(msg string, args ...interface{}) {
+	DefaultLogger.Warn(msg, args...)
+}
+
 // Error omit message and k,v paris at info level.
 func Error(msg string, args ...interface{}) {
 	DefaultLogger.Error(msg, args...)

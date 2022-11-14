@@ -10,6 +10,8 @@ require (
 	github.com/hashicorp/go-hclog v1.3.1
 	github.com/hashicorp/go-plugin v1.4.6
 	github.com/polarismesh/go-restful-openapi/v2 v2.0.0-20220928152401-083908d10219
+	github.com/prashantv/gostub v1.1.0
+	github.com/stretchr/testify v1.8.0
 	go.uber.org/zap v1.23.0
 	golang.org/x/time v0.2.0
 	google.golang.org/grpc v1.50.1
@@ -19,6 +21,7 @@ require (
 require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
@@ -34,6 +37,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/oklog/run v1.0.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20210421230115-4e50805a0758 // indirect
@@ -41,4 +45,5 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

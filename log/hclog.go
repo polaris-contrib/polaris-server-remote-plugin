@@ -29,7 +29,9 @@ type hcLoggerWrapper struct {
 func newHCLoggerWrapper() *hcLoggerWrapper {
 	return &hcLoggerWrapper{
 		Logger: hclog.New(&hclog.LoggerOptions{
-			JSONFormat: true,
+			Level:           hclog.Debug,
+			JSONFormat:      true,
+			IncludeLocation: true,
 		}),
 	}
 }

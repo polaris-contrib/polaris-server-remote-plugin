@@ -18,8 +18,6 @@
 package watcher
 
 import (
-	"time"
-
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/polaris-contrib/polaris-server-remote-plugin-common/log"
@@ -48,7 +46,6 @@ func New(path string, callback OnModifiedEvent) *Watcher {
 	}
 
 	go func(pw *Watcher) {
-		time.Sleep(time.Second * 10)
 		for {
 			select {
 			case ev := <-watcher.Events:
