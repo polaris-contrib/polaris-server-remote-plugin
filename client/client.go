@@ -150,7 +150,7 @@ func (c *Client) recreate() error {
 	)
 	switch c.config.Mode {
 	case RumModelCompanion:
-		pluginClient = c.recreateLocal()
+		pluginClient = c.recreateCompanion()
 	case RumModelRemote:
 		pluginClient, err = c.recreateRemote()
 	default:
@@ -183,9 +183,9 @@ func (c *Client) dispense(pluginClient *plugin.Client) error {
 	return nil
 }
 
-func (c *Client) recreateLocal() *plugin.Client {
-	cmd := exec.Command(c.pluginPath, c.config.Local.Args...)
-	cmd.Env = append(cmd.Env, fmt.Sprintf("PLUGIN_PROCS=%d", c.config.Local.MaxProcs))
+func (c *Client) recreateCompanion() *plugin.Client {
+	cmd := exec.Command(c.pluginPath, c.config.Companion.Args...)
+	cmd.Env = append(cmd.Env, fmt.Sprintf("PLUGIN_PROCS=%d", c.config.Companion.MaxProcs))
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PLUGIN_NAME=%s", c.config.Name))
 	pluginClient := plugin.NewClient(&plugin.ClientConfig{
 		HandshakeConfig: pluginsdk.Handshake,

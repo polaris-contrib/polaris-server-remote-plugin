@@ -58,26 +58,26 @@ type Config struct {
 	Mode string `yaml:"mode" json:"mode"`
 	// Remote remote plugin config
 	Remote RemoteConfig `yaml:"remote" json:"remote"`
-	// Local local plugin config
-	Local CompanionConfig `yaml:"local" json:"local"`
+	// Companion companion plugin config
+	Companion CompanionConfig `yaml:"companion" json:"companion"`
 	// Logger logger instance, use hclog as default
 	Logger log.Logger
 }
 
 // repairConfig repairs config.
 func (c *Config) repairConfig() {
-	if c.Local.MaxProcs == 0 {
-		c.Local.MaxProcs = 1
+	if c.Companion.MaxProcs == 0 {
+		c.Companion.MaxProcs = 1
 	}
 
-	if c.Local.MaxProcs == 0 && c.Local.MaxProcs >= 4 {
-		c.Local.MaxProcs = 4
+	if c.Companion.MaxProcs == 0 && c.Companion.MaxProcs >= 4 {
+		c.Companion.MaxProcs = 4
 	}
 }
 
 // pluginLoadPath the path where plugin loading.
 func (c *Config) pluginLoadPath() (string, error) {
-	fullPath := c.Local.Path
+	fullPath := c.Companion.Path
 	if fullPath == "" {
 		// Use plugin name and using relative path to load plugin.
 		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))

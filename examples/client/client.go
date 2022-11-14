@@ -21,7 +21,7 @@ func main() {
 		&client.Config{
 			Name: "remote-rate-limit-server-v1",
 			Mode: client.RumModelCompanion,
-			Local: client.CompanionConfig{
+			Companion: client.CompanionConfig{
 				MaxProcs: 1,
 			},
 		},
