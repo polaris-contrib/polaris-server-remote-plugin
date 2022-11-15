@@ -16,6 +16,7 @@ func main() {
 		client1 client.Client
 		client2 client.Client
 		client3 client.Client
+		client4 client.Client
 	)
 	if client1, err = client.Register(
 		&client.Config{
@@ -50,11 +51,19 @@ func main() {
 		log.Fatal("server-v3 register failed", "error", err)
 	}
 
-	clientInvoke(client1, "1")
-	clientInvoke(client2, "2")
+	if client4, err = client.Register(
+		&client.Config{
+			Name: "remote-rate-limit-server-v4",
+			Mode: client.RumModelCompanion,
+		}); err != nil {
+		log.Fatal("server-v4 register failed", "error", err)
+	}
 
 	for i := 0; i < 1000; i++ {
+		clientInvoke(client1, "1")
+		clientInvoke(client2, "2")
 		clientInvoke(client3, "3")
+		clientInvoke(client4, "4")
 		time.Sleep(time.Second)
 	}
 }

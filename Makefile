@@ -13,7 +13,7 @@
 # CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
-.PHONY: protoc test build protoc/include
+.PHONY: protoc test build protoc/*
 
 # 任意平台，如果本地有安装 protoc 环境，均可以使用
 protoc:
@@ -25,6 +25,21 @@ protoc:
 PROTOC:=./api/protoc/bin/protoc
 protoc/include:
 	${PROTOC} --proto_path=./api -I ./api/protoc/include/ --go_out=plugins=grpc:./api ./api/*.proto
+
+# python grpc
+protoc/python:
+	pip3 install grpcio-tools
+	python3 -m grpc_tools.protoc \
+		--proto_path=./api -I ./api/protoc/include/ \
+		--python_out=./examples/server/v4 \
+		--pyi_out=./examples/server/v4 \
+		--grpc_python_out=./examples/server/v4 \
+		./api/*.proto
+
+# 构建 Python 环境
+build/python:
+	pip3 install pyinstaller
+	pyinstaller --specpath=./examples/server/v4 --distpath=./ -n=remote-rate-limit-server-v4 -F ./examples/server/v4/server.py
 
 # 构建示例
 build:
