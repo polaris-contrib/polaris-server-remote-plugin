@@ -39,6 +39,7 @@ protoc/python:
 # 构建 Python 环境
 build/python:
 	pip3 install pyinstaller
+	pip3 install grpcio-tools
 	pyinstaller --specpath=./examples/server/v4 --distpath=./ -n=remote-rate-limit-server-v4 -F ./examples/server/v4/server.py
 
 # 构建示例
@@ -56,7 +57,7 @@ build:
 	go build -o remote-rate-limit-server-v3 examples/server/v3/server.go
 
 # 运行示例应用
-test: build
+test: build build/python
 	echo 'clean old server...'
 	ps aux | grep -v "grep" | grep "rate-limit-server" | awk '{print $$2}' | xargs kill -9
 
