@@ -3,6 +3,7 @@ module github.com/polaris-contrib/polaris-server-remote-plugin-common
 go 1.17
 
 require (
+	github.com/agiledragon/gomonkey v2.0.2+incompatible
 	github.com/emicklei/go-restful/v3 v3.10.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/golang/mock v1.6.0

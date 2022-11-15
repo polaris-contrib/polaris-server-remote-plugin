@@ -17,7 +17,10 @@
 
 package client
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
 // factory
 var factory = NewFactory()
@@ -25,18 +28,18 @@ var factory = NewFactory()
 // Factory plugin client factory.
 type Factory struct {
 	// pluginSet plugin named client set.
-	pluginSet map[string]*Client
+	pluginSet map[string]Client
 	// locker locker for pluginSet update/delete
 	locker sync.Mutex
 }
 
 // NewFactory returns a new Factory.
 func NewFactory() *Factory {
-	return &Factory{pluginSet: make(map[string]*Client)}
+	return &Factory{pluginSet: make(map[string]Client)}
 }
 
 // Get return client by name, return nil if the named plugin not exists.
-func (f *Factory) Get(name string) *Client {
+func (f *Factory) Get(name string) Client {
 	client, ex := f.pluginSet[name]
 	if !ex {
 		return nil
@@ -45,7 +48,7 @@ func (f *Factory) Get(name string) *Client {
 }
 
 // Register called by plugin client and start up the plugin main process.
-func Register(config *Config) (*Client, error) {
+func Register(config *Config) (Client, error) {
 	factory.locker.Lock()
 	defer factory.locker.Unlock()
 
@@ -57,6 +60,9 @@ func Register(config *Config) (*Client, error) {
 	c, err := newClient(config)
 	if err != nil {
 		return nil, err
+	}
+	if err = c.Check(); err != nil {
+		return nil, fmt.Errorf("fail to check client: %w", err)
 	}
 	factory.pluginSet[name] = c
 

@@ -38,7 +38,6 @@ func NewResource() *Resource {
 // Plugin plugin model
 type Plugin struct {
 	Name   string  `json:"name"`
-	Path   string  `json:"path"`
 	Config *Config `json:"config"`
 }
 
@@ -84,8 +83,7 @@ func (resource *Resource) findAll(_ *restful.Request, res *restful.Response) {
 	for name, plugin := range factory.pluginSet {
 		plugins = append(plugins, Plugin{
 			Name:   name,
-			Path:   plugin.pluginPath,
-			Config: plugin.config,
+			Config: plugin.Config(),
 		})
 	}
 	_ = res.WriteEntity(plugins)
@@ -133,7 +131,7 @@ func (resource *Resource) enable(req *restful.Request, res *restful.Response) {
 		return
 	}
 
-	err := plugin.Open()
+	err := plugin.Enable()
 	if err != nil {
 		responseError(res, 500, fmt.Errorf("fail to enable plugin: %w", err))
 		return

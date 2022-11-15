@@ -26,8 +26,8 @@ import (
 	"github.com/polaris-contrib/polaris-server-remote-plugin-common/api"
 )
 
-// PluginClient wraps a remote pluginapi client.
-type PluginClient struct {
+// RPCClient wraps a remote plugin api client.
+type RPCClient struct {
 	api.PluginClient
 }
 
@@ -77,5 +77,5 @@ func (p *Plugin) GRPCServer(_ *plugin.GRPCBroker, s *grpc.Server) error {
 
 // GRPCClient implements plugin.Plugin GRPCClient method.
 func (p *Plugin) GRPCClient(_ context.Context, _ *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
-	return &PluginClient{PluginClient: api.NewPluginClient(c)}, nil
+	return &RPCClient{PluginClient: api.NewPluginClient(c)}, nil
 }

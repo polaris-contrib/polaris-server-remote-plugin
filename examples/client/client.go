@@ -13,9 +13,9 @@ import (
 func main() {
 	var (
 		err     error
-		client1 *client.Client
-		client2 *client.Client
-		client3 *client.Client
+		client1 client.Client
+		client2 client.Client
+		client3 client.Client
 	)
 	if client1, err = client.Register(
 		&client.Config{
@@ -59,7 +59,7 @@ func main() {
 	}
 }
 
-func clientInvoke(pc *client.Client, name string) {
+func clientInvoke(pc client.Client, name string) {
 	req, err := pluginsdk.MarshalRequest(&api.RateLimitPluginRequest{
 		Type: api.RatelimitType_IPRatelimit, Key: "127.0.0.1",
 	})

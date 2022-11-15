@@ -19,7 +19,6 @@ package client
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -35,21 +34,34 @@ import (
 	"github.com/polaris-contrib/polaris-server-remote-plugin-common/watcher"
 )
 
-// Client is a rich plugin client
-type Client struct {
-	sync.Mutex          // Mutex for manage client
-	enable       bool   // represents the plugin is enabled or not
-	pluginName   string // the name of the plugin, used for manage.
-	pluginPath   string // the full path of the plugin, go-plugin start plugin according plugin path.
-	address      string // address uses to interact with remote plugin server.
-	watch        *watcher.Watcher
-	config       *Config               // the setup config of the plugin
-	pluginClient *plugin.Client        // the go-plugin client, polaris-serverImp run in grpc-client side.
-	service      *plugins.PluginClient // service is the plugin-grpc-service client.
+// Client plugin client interface
+//
+//go:generate mockgen -source=client.go -destination=client_mock.go -package=client Client
+type Client interface {
+	Call(ctx context.Context, request *api.Request) (*api.Response, error)
+	Disable() error
+	Enable() error
+	Close() error
+	Check() error
+	Name() string
+	Config() *Config
+}
+
+// clientImpl is a rich plugin client
+type clientImpl struct {
+	sync.Mutex                      // Mutex for manage client
+	enable       bool               // represents the plugin is enabled or not
+	pluginName   string             // the name of the plugin, used for manage.
+	pluginPath   string             // the full path of the plugin, go-plugin start plugin according plugin path.
+	address      string             // uses to interact with remote plugin server.
+	config       *Config            // the setup config of the plugin
+	pluginClient *plugin.Client     // the go-plugin client, polaris-serverImp run in grpc-client side.
+	watch        *watcher.Watcher   // companion plugin file watcher.
+	service      *plugins.RPCClient // service is the plugin-grpc-service client.
 }
 
 // Call invokes the function synchronously.
-func (c *Client) Call(ctx context.Context, request *api.Request) (*api.Response, error) {
+func (c *clientImpl) Call(ctx context.Context, request *api.Request) (*api.Response, error) {
 	if err := c.Check(); err != nil {
 		return nil, err
 	}
@@ -57,7 +69,7 @@ func (c *Client) Call(ctx context.Context, request *api.Request) (*api.Response,
 }
 
 // Close cleans up grpc connection.
-func (c *Client) Close() error {
+func (c *clientImpl) Close() error {
 	if c.pluginClient == nil {
 		return nil
 	}
@@ -73,7 +85,7 @@ func (c *Client) Close() error {
 }
 
 // Disable set plugin is disabled.
-func (c *Client) Disable() error {
+func (c *clientImpl) Disable() error {
 	c.Lock()
 	defer c.Unlock()
 
@@ -89,8 +101,8 @@ func (c *Client) Disable() error {
 	return nil
 }
 
-// Open set plugin is enabled.
-func (c *Client) Open() error {
+// Enable set plugin is enabled.
+func (c *clientImpl) Enable() error {
 	c.Lock()
 	defer c.Unlock()
 
@@ -99,12 +111,12 @@ func (c *Client) Open() error {
 }
 
 // Check checks client still alive, create if not alive
-func (c *Client) Check() error {
+func (c *clientImpl) Check() error {
 	c.Lock()
 	defer c.Unlock()
 
 	if !c.enable {
-		return errors.New("plugin " + c.pluginName + " disable")
+		return fmt.Errorf("plugin %s is disabled", c.pluginName)
 	}
 
 	// plugin still alive, return as early as possible.
@@ -115,9 +127,19 @@ func (c *Client) Check() error {
 	return c.recreate()
 }
 
+// Name return plugin name.
+func (c *clientImpl) Name() string {
+	return c.pluginName
+}
+
+// Config return plugin config
+func (c *clientImpl) Config() *Config {
+	return c.config
+}
+
 // newClient returns a new client
-func newClient(config *Config) (*Client, error) {
-	c := new(Client)
+func newClient(config *Config) (*clientImpl, error) {
+	c := new(clientImpl)
 	c.enable = true
 	c.pluginName = config.Name
 	config.repairConfig()
@@ -136,14 +158,11 @@ func newClient(config *Config) (*Client, error) {
 	if c.config.Logger == nil {
 		c.config.Logger = log.DefaultLogger
 	}
-	if err := c.Check(); err != nil {
-		return nil, fmt.Errorf("fail to check client: %w", err)
-	}
 	return c, nil
 }
 
 // recreate
-func (c *Client) recreate() error {
+func (c *clientImpl) recreate() error {
 	var (
 		err          error
 		pluginClient *plugin.Client
@@ -167,7 +186,7 @@ func (c *Client) recreate() error {
 	return nil
 }
 
-func (c *Client) dispense(pluginClient *plugin.Client) error {
+func (c *clientImpl) dispense(pluginClient *plugin.Client) error {
 	rpcClient, err := pluginClient.Client()
 	if err != nil {
 		return err
@@ -179,11 +198,11 @@ func (c *Client) dispense(pluginClient *plugin.Client) error {
 	}
 
 	c.pluginClient = pluginClient
-	c.service = raw.(*plugins.PluginClient)
+	c.service = raw.(*plugins.RPCClient)
 	return nil
 }
 
-func (c *Client) recreateCompanion() *plugin.Client {
+func (c *clientImpl) recreateCompanion() *plugin.Client {
 	cmd := exec.Command(c.pluginPath, c.config.Companion.Args...)
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PLUGIN_PROCS=%d", c.config.Companion.MaxProcs))
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PLUGIN_NAME=%s", c.config.Name))
@@ -200,7 +219,7 @@ func (c *Client) recreateCompanion() *plugin.Client {
 	return pluginClient
 }
 
-func (c *Client) recreateRemote() (*plugin.Client, error) {
+func (c *clientImpl) recreateRemote() (*plugin.Client, error) {
 	addr, err := net.ResolveTCPAddr("tcp", c.config.Remote.Address)
 	if err != nil {
 		return nil, err
@@ -225,7 +244,7 @@ func (c *Client) recreateRemote() (*plugin.Client, error) {
 	return pluginClient, nil
 }
 
-func (c *Client) reload(_ string) {
+func (c *clientImpl) reload(_ string) {
 	if c == nil || c.pluginClient == nil {
 		return
 	}
