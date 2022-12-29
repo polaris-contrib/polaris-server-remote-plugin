@@ -5,6 +5,14 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class PingRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class PongResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
 class Request(_message.Message):
     __slots__ = ["payload"]
     PAYLOAD_FIELD_NUMBER: _ClassVar[int]

@@ -20,6 +20,11 @@ class PluginStub(object):
                 request_serializer=plugin__pb2.Request.SerializeToString,
                 response_deserializer=plugin__pb2.Response.FromString,
                 )
+        self.Ping = channel.unary_unary(
+                '/proto.Plugin/Ping',
+                request_serializer=plugin__pb2.PingRequest.SerializeToString,
+                response_deserializer=plugin__pb2.PongResponse.FromString,
+                )
 
 
 class PluginServicer(object):
@@ -32,6 +37,12 @@ class PluginServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Ping(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_PluginServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -39,6 +50,11 @@ def add_PluginServicer_to_server(servicer, server):
                     servicer.Call,
                     request_deserializer=plugin__pb2.Request.FromString,
                     response_serializer=plugin__pb2.Response.SerializeToString,
+            ),
+            'Ping': grpc.unary_unary_rpc_method_handler(
+                    servicer.Ping,
+                    request_deserializer=plugin__pb2.PingRequest.FromString,
+                    response_serializer=plugin__pb2.PongResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -65,5 +81,22 @@ class Plugin(object):
         return grpc.experimental.unary_unary(request, target, '/proto.Plugin/Call',
             plugin__pb2.Request.SerializeToString,
             plugin__pb2.Response.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Ping(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/proto.Plugin/Ping',
+            plugin__pb2.PingRequest.SerializeToString,
+            plugin__pb2.PongResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

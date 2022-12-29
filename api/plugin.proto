@@ -16,7 +16,7 @@
  */
 
 syntax = "proto3";
-package proto;
+package api.components;
 
 option  java_package = "cn.polaris.plugin.api";
 option  java_multiple_files = false;
@@ -37,7 +37,17 @@ message Response {
   google.protobuf.Any reply = 1;
 }
 
+// Ping request
+message PingRequest {
+
+}
+
+// Ping response
+message PongResponse {
+}
+
 // Plugin polaris remote plugin service.
 service Plugin {
   rpc Call(Request) returns (Response);
+  rpc Ping(PingRequest) returns (PongResponse);
 }

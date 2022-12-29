@@ -38,8 +38,8 @@ var _ api.PluginServer = (Service)(nil)
 //
 //go:generate mockgen -source=plugin.go -destination=plugin_mock.go -package=plugins Service
 type Service interface {
-	// Call implement plugin.Server.Call
 	Call(ctx context.Context, request *api.Request) (*api.Response, error)
+	Ping(ctx context.Context, request *api.PingRequest) (*api.PongResponse, error)
 }
 
 // serverImp must implements Service.
@@ -53,6 +53,11 @@ type serverImp struct {
 // Call calls plugin backend serverImp.
 func (s *serverImp) Call(ctx context.Context, req *api.Request) (*api.Response, error) {
 	return s.Backend.Call(ctx, req)
+}
+
+// Ping implements remote proto defined Plugin Ping method.
+func (s *serverImp) Ping(ctx context.Context, request *api.PingRequest) (*api.PongResponse, error) {
+	return s.Backend.Ping(ctx, request)
 }
 
 // Plugin must implement plugin.GRPCPlugin

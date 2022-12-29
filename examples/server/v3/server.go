@@ -36,7 +36,11 @@ import (
 type rateLimiter struct {
 }
 
-func (r rateLimiter) Call(_ context.Context, request *api.Request) (*api.Response, error) {
+func (s *rateLimiter) Ping(_ context.Context, request *api.PingRequest) (*api.PongResponse, error) {
+	return &api.PongResponse{}, nil
+}
+
+func (r *rateLimiter) Call(_ context.Context, request *api.Request) (*api.Response, error) {
 	var rateLimitRequest api.RateLimitPluginRequest
 	if err := pluginsdk.UnmarshalRequest(request, &rateLimitRequest); err != nil {
 		return nil, err

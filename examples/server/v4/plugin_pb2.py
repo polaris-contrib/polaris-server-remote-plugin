@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import any_pb2 as google_dot_protobuf_dot_any__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cplugin.proto\x12\x05proto\x1a\x19google/protobuf/any.proto\"0\n\x07Request\x12%\n\x07payload\x18\x01 \x01(\x0b\x32\x14.google.protobuf.Any\"/\n\x08Response\x12#\n\x05reply\x18\x01 \x01(\x0b\x32\x14.google.protobuf.Any21\n\x06Plugin\x12\'\n\x04\x43\x61ll\x12\x0e.proto.Request\x1a\x0f.proto.ResponseB*\n\x15\x63n.polaris.plugin.apiB\x07ServiceP\x00Z\x06./;apib\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cplugin.proto\x12\x05proto\x1a\x19google/protobuf/any.proto\"0\n\x07Request\x12%\n\x07payload\x18\x01 \x01(\x0b\x32\x14.google.protobuf.Any\"/\n\x08Response\x12#\n\x05reply\x18\x01 \x01(\x0b\x32\x14.google.protobuf.Any\"\r\n\x0bPingRequest\"\x0e\n\x0cPongResponse2b\n\x06Plugin\x12\'\n\x04\x43\x61ll\x12\x0e.proto.Request\x1a\x0f.proto.Response\x12/\n\x04Ping\x12\x12.proto.PingRequest\x1a\x13.proto.PongResponseB*\n\x15\x63n.polaris.plugin.apiB\x07ServiceP\x00Z\x06./;apib\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'plugin_pb2', globals())
@@ -26,6 +26,10 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _REQUEST._serialized_end=98
   _RESPONSE._serialized_start=100
   _RESPONSE._serialized_end=147
-  _PLUGIN._serialized_start=149
-  _PLUGIN._serialized_end=198
+  _PINGREQUEST._serialized_start=149
+  _PINGREQUEST._serialized_end=162
+  _PONGRESPONSE._serialized_start=164
+  _PONGRESPONSE._serialized_end=178
+  _PLUGIN._serialized_start=180
+  _PLUGIN._serialized_end=278
 # @@protoc_insertion_point(module_scope)

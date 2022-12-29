@@ -33,6 +33,10 @@ type rateLimiter struct {
 	limiter *rate.Limiter
 }
 
+func (s *rateLimiter) Ping(_ context.Context, request *api.PingRequest) (*api.PongResponse, error) {
+	return &api.PongResponse{}, nil
+}
+
 func (s *rateLimiter) Call(_ context.Context, request *api.Request) (*api.Response, error) {
 	var rateLimitRequest api.RateLimitPluginRequest
 	if err := pluginsdk.UnmarshalRequest(request, &rateLimitRequest); err != nil {

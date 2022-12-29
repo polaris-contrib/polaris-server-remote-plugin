@@ -12,6 +12,9 @@ class PluginServicer(plugin_pb2_grpc.PluginServicer):
     def Call(self, request, context):
         return plugin_pb2.Response()
 
+    def Ping(self, request, context):
+        return plugin_pb2.PongResponse()
+
 
 def serve():
     # Start the server

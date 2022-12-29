@@ -18,7 +18,9 @@
 # 任意平台，如果本地有安装 protoc 环境，均可以使用
 protoc:
 	go install github.com/golang/protobuf/protoc-gen-go@latest
-	protoc --proto_path=./api -I ./api/protoc/include/ --go_out=plugins=grpc:./api ./api/*.proto
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	protoc --proto_path=./api -I ./api/protoc/include/ --go-grpc_out=require_unimplemented_servers=false:./api --plugin=protoc-gen-grpc  ./api/*.proto
+	protoc --proto_path=./api -I ./api/protoc/include/ --go_out=./api ./api/*.proto
 
 
 # Linux 环境下如果没有protoc，可以使用 api/protoc 提供的

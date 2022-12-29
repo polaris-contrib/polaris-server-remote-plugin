@@ -19,16 +19,23 @@ package main
 
 import (
 	"context"
+	"net"
+	"os"
+
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	pluginsdk "github.com/polaris-contrib/polaris-server-remote-plugin-common"
 	"github.com/polaris-contrib/polaris-server-remote-plugin-common/api"
 	"github.com/polaris-contrib/polaris-server-remote-plugin-common/log"
-	"github.com/polaris-contrib/polaris-server-remote-plugin-common/server"
 )
 
 type rateLimiter struct{}
 
 func (s *rateLimiter) Ping(_ context.Context, request *api.PingRequest) (*api.PongResponse, error) {
+	log.Info("ping pong")
 	return &api.PongResponse{}, nil
 }
 
@@ -47,6 +54,48 @@ func (s *rateLimiter) Call(_ context.Context, request *api.Request) (*api.Respon
 	return response, nil
 }
 
+func init() {
+
+	logger, err := zap.Config{
+		Encoding:    "json",
+		Level:       zap.NewAtomicLevelAt(zapcore.DebugLevel),
+		OutputPaths: []string{"stdout"},
+	}.Build()
+	if err != nil {
+		panic(err)
+	}
+	log.SetDefaultLoggerWithZap(logger, "plugin-server-v5")
+}
+
+func cleanup(sockAddr string) {
+	_, err := os.Stat(sockAddr)
+	if err == nil {
+		if err = os.RemoveAll(sockAddr); err != nil {
+			log.Fatal("failed to remove socket file: %v", err)
+		}
+	}
+}
+
 func main() {
-	server.Serve(&rateLimiter{})
+	sockFile := "/tmp/dapr-components-sockets/polaris_server.sock"
+	//serverAddr, err := net.ResolveUnixAddr("unix", sockFile)
+	//if err != nil {
+	//	log.Fatal("failed to resolve unix addr")
+	//}
+
+	cleanup(sockFile)
+
+	lis, err := net.Listen("unix", sockFile)
+	if err != nil {
+		log.Fatal("failed to listen: %+v", err)
+	}
+
+	s := grpc.NewServer()
+	api.RegisterPluginServer(s, &rateLimiter{})
+
+	reflection.Register(s) // 开启反射服务
+
+	if err = s.Serve(lis); err != nil {
+		log.Fatal("failed to serve: %v", err)
+	}
 }
