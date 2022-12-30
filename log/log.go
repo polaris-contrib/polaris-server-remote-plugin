@@ -19,13 +19,20 @@ package log
 
 import (
 	"github.com/hashicorp/go-hclog"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // DefaultLogger is the default logger.
 var DefaultLogger Logger
 
 func init() {
-	DefaultLogger = newHCLoggerWrapper()
+	logger, _ := zap.Config{
+		Encoding:    "json",
+		Level:       zap.NewAtomicLevelAt(zapcore.DebugLevel),
+		OutputPaths: []string{"stdout"},
+	}.Build()
+	SetDefaultLoggerWithZap(logger, "default")
 }
 
 // Logger is the plugin logger interface.
