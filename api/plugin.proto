@@ -16,38 +16,15 @@
  */
 
 syntax = "proto3";
-package api.components;
+package api;
 
 option  java_package = "cn.polaris.plugin.api";
 option  java_multiple_files = false;
 option  java_outer_classname = "Service";
 option  go_package = "./;api";
 
-import "google/protobuf/any.proto";
-
-
-// Request polaris remote plugin request from polaris-server.
-message Request {
-  google.protobuf.Any payload = 1;
-}
-
-// Response polaris remote plugin response from third remote plugin.
-message Response {
-  // Reply the plugin server return value.
-  google.protobuf.Any reply = 1;
-}
-
 // Ping request
-message PingRequest {
-
-}
+message PingRequest {}
 
 // Ping response
-message PongResponse {
-}
-
-// Plugin polaris remote plugin service.
-service Plugin {
-  rpc Call(Request) returns (Response);
-  rpc Ping(PingRequest) returns (PongResponse);
-}
+message PongResponse {}

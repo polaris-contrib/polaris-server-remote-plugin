@@ -25,29 +25,22 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	pluginsdk "github.com/polaris-contrib/polaris-server-remote-plugin-common"
 	"github.com/polaris-contrib/polaris-server-remote-plugin-common/api"
 	"github.com/polaris-contrib/polaris-server-remote-plugin-common/log"
 )
 
+var _ api.RateLimiterServer = (*rateLimiter)(nil)
+
 type rateLimiter struct{}
 
-func (s *rateLimiter) Ping(_ context.Context, request *api.PingRequest) (*api.PongResponse, error) {
-	log.Info("ping pong")
+func (s *rateLimiter) Ping(_ context.Context, req *api.PingRequest) (*api.PongResponse, error) {
+	log.Info("ping pong", "request", req)
 	return &api.PongResponse{}, nil
 }
 
-func (s *rateLimiter) Call(_ context.Context, request *api.Request) (*api.Response, error) {
-	var rateLimitRequest api.RateLimitPluginRequest
-	if err := pluginsdk.UnmarshalRequest(request, &rateLimitRequest); err != nil {
-		log.Error("fail to marshal response data", "error", err)
-		return nil, err
-	}
-	response, err := pluginsdk.MarshalResponse(&api.RateLimitPluginResponse{Allow: true})
-	if err != nil {
-		log.Error("fail to marshal response data", "error", err)
-		return nil, err
-	}
+// Allow return allow
+func (s *rateLimiter) Allow(_ context.Context, request *api.RateLimitRequest) (*api.RateLimitResponse, error) {
+	response := &api.RateLimitResponse{Allow: true}
 	log.Info("success response", "response", response, "request", request)
 	return response, nil
 }
@@ -71,7 +64,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	api.RegisterPluginServer(s, &rateLimiter{})
+	api.RegisterRateLimiterServer(s, &rateLimiter{})
 
 	reflection.Register(s) // 开启反射服务
 

@@ -31,6 +31,15 @@ func init() {
 		Encoding:    "json",
 		Level:       zap.NewAtomicLevelAt(zapcore.DebugLevel),
 		OutputPaths: []string{"stdout"},
+		EncoderConfig: zapcore.EncoderConfig{
+			MessageKey:   "message",
+			LevelKey:     "level",
+			EncodeLevel:  zapcore.CapitalLevelEncoder,
+			TimeKey:      "time",
+			EncodeTime:   zapcore.ISO8601TimeEncoder,
+			CallerKey:    "caller",
+			EncodeCaller: zapcore.ShortCallerEncoder,
+		},
 	}.Build()
 	SetDefaultLoggerWithZap(logger, "default")
 }
