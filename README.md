@@ -1,4 +1,4 @@
-# polaris-server-remote-plugin-common
+# Polaris Server Remote Plugin
 
 This is a common library for the Polaris Server Remote Plugin. You can use this library to create your own remote
 plugin. This package allows you to run you own grpc-based plugin service, you just need to implement the
